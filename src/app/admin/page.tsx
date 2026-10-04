@@ -3,17 +3,20 @@ import User from "@/models/User";
 import Order from "@/models/Order";
 import { DollarSign, ShoppingBag, UserCheck } from "lucide-react";
 
+// Tắt chế độ tạo trang tĩnh (Prerender) của Next.js cho trang này
+export const dynamic = "force-dynamic";
+
 // Hàm lấy dữ liệu thật từ Database
 async function getDashboardData() {
   await connectDB();
 
-  // 1. Đếm tổng số khách hàng (Trừ ông admin ra nếu muốn, ở đây mình đếm hết)
+  // 1. Đếm tổng số khách hàng
   const totalUsers = await User.countDocuments();
 
   // 2. Đếm tổng số đơn hàng
   const totalOrders = await Order.countDocuments();
 
-  // 3. Tính tổng doanh thu (Cộng dồn cột totalAmount của tất cả đơn hàng)
+  // 3. Tính tổng doanh thu
   const revenueResult = await Order.aggregate([
     { $group: { _id: null, total: { $sum: "$totalAmount" } } }
   ]);
@@ -44,7 +47,6 @@ export default async function AdminDashboard() {
             <h3 className="text-slate-400">Tổng doanh thu</h3>
             <DollarSign className="text-green-500" />
           </div>
-          {/* Hiển thị số thật */}
           <p className="text-3xl font-bold">{formatMoney(totalRevenue)}</p>
         </div>
 
@@ -54,7 +56,6 @@ export default async function AdminDashboard() {
             <h3 className="text-slate-400">Đơn hàng mới</h3>
             <ShoppingBag className="text-blue-500" />
           </div>
-          {/* Hiển thị số thật */}
           <p className="text-3xl font-bold">{totalOrders}</p>
         </div>
 
@@ -64,7 +65,6 @@ export default async function AdminDashboard() {
             <h3 className="text-slate-400">Khách hàng</h3>
             <UserCheck className="text-purple-500" />
           </div>
-          {/* Hiển thị số thật */}
           <p className="text-3xl font-bold">{totalUsers}</p>
         </div>
       </div>
